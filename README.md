@@ -35,9 +35,9 @@ We can now interact with the receipt-processor at the provided Routes using curl
 
 | Feature         | Endpoint                  | Finished |
 |------------------|---------------------------|----------|
-| Process Receipts | `/receipts/process`       | ❌       |
+| Process Receipts | `/receipts/process`       | ✅       |
 | Get Points       | `/receipts/{id}/points`   | ✅       |
-| BadRequest (400) |                           | ❌       |
+| BadRequest (400) |                           | ✅       |
 | NotFound (404)   |                           | ✅       |
 
 # Assumptions
