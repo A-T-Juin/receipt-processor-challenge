@@ -12,7 +12,7 @@ def test_root():
   }
 
 def test_get_points_by_receipt_id_success():
-  response = client.get("/receipts/1000/points")
+  response = client.get("/receipts/63cf49ec-8097-49d1-85a0-21c24176fcaa/points")
   assert response.status_code == 200
   assert response.json() == {
     "points": 500
@@ -36,25 +36,15 @@ def test_process_receipt_success():
         {
           "shortDescription": "Mountain Dew 12PK",
           "price": "6.49"
-        },{
-          "shortDescription": "Emils Cheese Pizza",
-          "price": "12.25"
-        },{
-          "shortDescription": "Knorr Creamy Chicken",
-          "price": "1.26"
-        },{
-          "shortDescription": "Doritos Nacho Cheese",
-          "price": "3.35"
-        },{
-          "shortDescription": "   Klarbrunn 12-PK 12 FL OZ  ",
-          "price": "12.00"
         }
       ],
       "total": "35.35"
     }
   )
+  parsed_response = response.json()
   assert response.status_code == 200
-
+  assert type(parsed_response["id"])  == str
+  
 def test_tabulate_points():
   target_example = {
     "retailer": "Target",
