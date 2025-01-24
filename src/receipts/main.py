@@ -19,10 +19,6 @@ async def receipt_validation_exception_handler(request: Request, exc: RequestVal
         content={"description": "The receipt is invalid."}
     )
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
 @app.post("/receipts/process")
 def process_receipt(receipt: Receipt):
     parsed_receipt_input = Receipt.model_dump(receipt)

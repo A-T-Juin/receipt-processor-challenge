@@ -4,13 +4,6 @@ from src.utils.receipts_utils import tabulate_points
 
 client = TestClient(app)
 
-def test_root():
-  response = client.get("/")
-  assert response.status_code == 200
-  assert response.json() == {
-    "message": "Hello World"
-  }
-
 def test_get_points_by_receipt_id_success():
   response = client.get("/receipts/63cf49ec-8097-49d1-85a0-21c24176fcaa/points")
   assert response.status_code == 200
@@ -75,6 +68,78 @@ def test_tabulate_points():
 
   assert tabulate_points(target_example) == 28
   assert tabulate_points(m_and_m_example) == 109
+
+def test_process_receipt_validation_shortDescrption():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain & Dew 12PK",
+          "price": "6.49"
+        }
+      ],
+      "total": "35.35"
+    }
+  )
+  assert response.status_code == 400
+
+def test_process_receipt_validation_price():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target!",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.9"
+        }
+      ],
+      "total": "35.35"
+    }
+  )
+  assert response.status_code == 400
+
+def test_process_receipt_validation_total():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target!",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.49"
+        }
+      ],
+      "total": "35"
+    }
+  )
+  assert response.status_code == 400
+
+def test_process_receipt_validation_retailer():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target!",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.49"
+        }
+      ],
+      "total": "35.35"
+    }
+  )
+  assert response.status_code == 400
 
 def test_process_receipt_success():
   response = client.post(
