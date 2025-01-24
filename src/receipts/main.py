@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from src.receipts.schemas import Receipt
+from src.utils.receipts_utils import tabulate_points
 
 app = FastAPI()
 
@@ -7,10 +9,17 @@ volatile_memory = {
     "1000": 500, # test data
 }
 
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.post("/receipts/process")
+def process_receipt(receipt: Receipt):
+    parsed_receipt_input = Receipt.model_dump(receipt)
+    new_id = len(volatile_memory)
+    points_earned = tabulate_points(parsed_receipt_input)
+    volatile_memory[new_id] = points_earned
+    return {"id": new_id}
 
 # grab points from our db
 @app.get("/receipts/{receipt_id}/points")
