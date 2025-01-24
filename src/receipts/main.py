@@ -16,7 +16,7 @@ async def root():
 @app.post("/receipts/process")
 def process_receipt(receipt: Receipt):
     parsed_receipt_input = Receipt.model_dump(receipt)
-    new_id = len(volatile_memory)
+    new_id = str(len(volatile_memory))
     points_earned = tabulate_points(parsed_receipt_input)
     volatile_memory[new_id] = points_earned
     return {"id": new_id}
