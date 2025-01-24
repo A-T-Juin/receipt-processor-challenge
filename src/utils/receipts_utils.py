@@ -43,7 +43,12 @@ def score_purchase_time(purchase_time):
   score = 0
   hour_of_time = int(purchase_time[:2])
   minute_of_time = int(purchase_time[-2:])
-  if 14 <= hour_of_time <= 15 and 1 <= minute_of_time <= 59:
+
+  if hour_of_time == 14 and minute_of_time == 0:
+    return 0
+    
+  # 15:00 would be missed previously by 1 <= minute_of_time <= 59
+  if 14 <= hour_of_time <= 15 and 0 <= minute_of_time <= 59:
     score = 10
   return score
 

@@ -105,11 +105,17 @@ def test_score_purchase_date1():
 def test_score_purchase_date2():
   assert score_purchase_date("10-01-02") == 0
 
-def score_purchase_time1():
+def test_score_purchase_time1():
   assert score_purchase_time("14:00") == 0
 
-def score_purchase_time2():
+def test_score_purchase_time2():
   assert score_purchase_time("14:01") == 10
+
+def test_score_purchase_time3():
+  assert score_purchase_time("15:00") == 10
+
+def test_score_purchase_time4():
+  assert score_purchase_time("16:00") == 0
 
 def test_tabulate_points():
   target_example = {
