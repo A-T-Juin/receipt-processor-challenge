@@ -1,5 +1,6 @@
 import uuid
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from src.receipts.schemas import Receipt
 from src.utils.receipts_utils import tabulate_points
@@ -9,6 +10,14 @@ app = FastAPI()
 volatile_memory = {
     "63cf49ec-8097-49d1-85a0-21c24176fcaa": 500, # test data
 }
+
+# overrides FastAPI's default validation error to match design specifications
+@app.exception_handler(RequestValidationError)
+async def receipt_validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=400,
+        content={"description": "The receipt is invalid."}
+    )
 
 @app.get("/")
 async def root():

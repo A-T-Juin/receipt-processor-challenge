@@ -25,26 +25,6 @@ def test_get_points_by_receipt_id_failure():
     "description": "No receipt found for that ID."
   }
 
-def test_process_receipt_success():
-  response = client.post(
-    "/receipts/process",
-    json={
-      "retailer": "Target",
-      "purchaseDate": "2022-01-01",
-      "purchaseTime": "13:01",
-      "items": [
-        {
-          "shortDescription": "Mountain Dew 12PK",
-          "price": "6.49"
-        }
-      ],
-      "total": "35.35"
-    }
-  )
-  parsed_response = response.json()
-  assert response.status_code == 200
-  assert type(parsed_response["id"])  == str
-  
 def test_tabulate_points():
   target_example = {
     "retailer": "Target",
@@ -95,3 +75,45 @@ def test_tabulate_points():
 
   assert tabulate_points(target_example) == 28
   assert tabulate_points(m_and_m_example) == 109
+
+def test_process_receipt_success():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.49"
+        }
+      ],
+      "total": "35.35"
+    }
+  )
+  parsed_response = response.json()
+  assert response.status_code == 200
+  assert type(parsed_response["id"])  == str
+  
+
+def test_process_receipt_failure():
+  response = client.post(
+    "/receipts/process",
+    json={
+      "retailer": "Target",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.49"
+        }
+      ]
+    }
+  )
+
+  assert response.status_code == 400
+  assert response.json() == {
+    "description": "The receipt is invalid."
+  }
