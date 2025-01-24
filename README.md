@@ -5,7 +5,7 @@ Hi! This is my take on the receipt-processor-challenge. I am going to build this
 # Installation
 
 1. Clone this repository into your directory of choice
-2. Ensure that docker is installed on your native machine
+2. Ensure that docker is installed on your machine
 3. Start docker
 4. Navigate to the root of the cloned project
 5. Run this code block to build the image:
@@ -24,7 +24,6 @@ docker-compose up
 
 | Routes                            | description |
 |-----------------------------------|-------------|
-| `localhost:80/docs`                | FastAPI allows us to view the  specifications for each endpoint associated with our application by navigating to this route in our browser |
 | `localhost:80/receipts/process`    | Accepts ```POST``` method and calculate points earned for a valid receipt. Returns in the form ```{id: str}``` |
 | `localhost:80/receipts/{id}/points`| Accepts ```GET``` method and returns the number of points earned by the receipt with the associated receiptID. Returns in the form ```{points: int}``` |
 
