@@ -1,22 +1,115 @@
 from fastapi.testclient import TestClient
-from src.receipts.main import app
-from src.utils.receipts_utils import tabulate_points
+from src.receipts.main import app, volatile_memory
+from src.utils.receipts_utils import score_retailer, score_total, score_items, score_purchase_date, score_purchase_time, tabulate_points
 
 client = TestClient(app)
 
-def test_get_points_by_receipt_id_success():
-  response = client.get("/receipts/63cf49ec-8097-49d1-85a0-21c24176fcaa/points")
-  assert response.status_code == 200
-  assert response.json() == {
-    "points": 500
-  }
+def test_score_retailer1():
+  assert score_retailer("Target") == 6
 
-def test_get_points_by_receipt_id_failure():
-  response = client.get("/receipts/99/points")
-  assert response.status_code == 404
-  assert response.json() == {
-    "description": "No receipt found for that ID."
-  }
+def test_score_retailer2():
+  assert score_retailer("Tar get") == 6
+
+def test_score_retailer3():
+  assert score_retailer(" Tar get") == 6
+
+def test_score_total1():
+  assert score_total("35.35") == 0
+
+def test_score_total2():
+  assert score_total("35.25") == 25
+
+def test_score_total3():
+  assert score_total("35.00") == 75
+
+def test_score_items1():
+  assert score_items([
+    {
+      "shortDescription": "churro",
+      "price": "10.00"
+    }
+  ]) == 2
+
+
+def test_score_items2():
+  assert score_items([
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    }
+  ]) == 5
+
+def test_score_items3():
+  assert score_items([
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    }
+  ]) == 5
+
+def test_score_items4():
+  assert score_items([
+    {
+      "shortDescription": "churro",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    }
+  ]) == 7
+
+def test_score_items5():
+  assert score_items([
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churros",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churro",
+      "price": "10.00"
+    }
+  ]) == 7
+
+def test_score_items6():
+  assert score_items([
+    {
+      "shortDescription": "churro",
+      "price": "10.00"
+    },
+    {
+      "shortDescription": "churro",
+      "price": "10.00"
+    }
+  ]) == 9
+
+def test_score_purchase_date1():
+  assert score_purchase_date("10-01-01") == 6
+
+def test_score_purchase_date2():
+  assert score_purchase_date("10-01-02") == 0
+
+def score_purchase_time1():
+  assert score_purchase_time("14:00") == 0
+
+def score_purchase_time2():
+  assert score_purchase_time("14:01") == 10
 
 def test_tabulate_points():
   target_example = {
@@ -142,6 +235,8 @@ def test_process_receipt_validation_retailer():
   assert response.status_code == 400
 
 def test_process_receipt_success():
+  # this should net 12 points:
+    # 6 pts for name + 6 pts for odd date
   response = client.post(
     "/receipts/process",
     json={
@@ -181,4 +276,20 @@ def test_process_receipt_failure():
   assert response.status_code == 400
   assert response.json() == {
     "description": "The receipt is invalid."
+  }
+
+def test_get_points_by_receipt_id_success():
+  # this works because we have only 1 item in our db from the previous test
+  id = list(volatile_memory.keys())[0]
+  response = client.get(f"/receipts/{id}/points")
+  assert response.status_code == 200
+  assert response.json() == {
+    "points": 12
+  }
+
+def test_get_points_by_receipt_id_failure():
+  response = client.get("/receipts/99/points")
+  assert response.status_code == 404
+  assert response.json() == {
+    "description": "No receipt found for that ID."
   }

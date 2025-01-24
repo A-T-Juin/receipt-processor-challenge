@@ -7,9 +7,8 @@ from src.utils.receipts_utils import tabulate_points
 
 app = FastAPI()
 
-volatile_memory = {
-    "63cf49ec-8097-49d1-85a0-21c24176fcaa": 500, # test data
-}
+# Not using a persistent DB so the following should suffice
+volatile_memory = {}
 
 # overrides FastAPI's default validation error to match design specifications
 @app.exception_handler(RequestValidationError)
